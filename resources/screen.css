@@ -1,0 +1,54 @@
+* {
+  box-sizing: border-box;
+}
+
+.row {
+  border: solid 1px #000;
+}
+
+.row:before, .row:after {
+  display: table;
+  content: " ";
+  clear: both;
+}
+
+.row {
+  margin-right: -5;
+  margin-left: -5;
+}
+
+.col-md-1 {
+  width: 8.333333333333332%;
+  float: left;
+  padding-right: 5;
+  padding-left: 5;
+  min-height: 1px;
+  position: relative;
+}
+
+.col-md-4 {
+  width: 33.33333333333333%;
+  float: left;
+  padding-right: 5;
+  padding-left: 5;
+  min-height: 1px;
+  position: relative;
+}
+
+.col-md-6 {
+  width: 50.0%;
+  float: left;
+  padding-right: 5;
+  padding-left: 5;
+  min-height: 1px;
+  position: relative;
+}
+
+.col-md-8 {
+  width: 66.66666666666667%;
+  float: left;
+  padding-right: 5;
+  padding-left: 5;
+  min-height: 1px;
+  position: relative;
+}
