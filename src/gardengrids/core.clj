@@ -1,32 +1,68 @@
 (ns gardengrids.core
-  (:require [garden.def :refer [defstylesheet defstyles]]
-            [garden.units :refer [px]]))
+  (:require [garden.core :refer [css]]
+            [garden.def :refer [defstylesheet defstyles]]
+            [garden.units :refer [px]]
+            [garden.stylesheet :refer [at-media]]))
+
+(def ^:dynamic *grid-gutter* 20)
+(def ^:dynamic *screen-sm-min* (px 768))
+(def ^:dynamic *screen-md-min* (px 992))
+(def ^:dynamic *screen-lg-min* (px 1200))
+(def ^:dynamic *container-sm-min* (+ 720 *grid-gutter*))
+(def ^:dynamic *container-md-min* (+ 940 *grid-gutter*))
+(def ^:dynamic *container-lg-min* (+ 1140 *grid-gutter*))
 
 (def clearfix
   [:&:before :&:after {:content "\" \""
                        :display "table"}
    :&:after {:clear "both"}])
 
+
+(defn container-fixed
+  ([] (container-fixed *grid-gutter*))
+  ([gutter]
+     [clearfix
+      [:& {:margin-right "auto"
+           :margin-left "auto"
+           :padding-left (px (/ gutter 2))
+           :padding-right (px (/ gutter 2))
+           }]]))
+
+(defn container
+  ([] (container *grid-gutter*))
+  ([gutter]
+     [(container-fixed gutter)
+      (at-media {:min-width *screen-sm-min*}
+                [:& {:width (px *container-sm-min*)}])
+      (at-media {:min-width *screen-md-min*}
+                [:& {:width (px *container-md-min*)}])
+      (at-media {:min-width *screen-lg-min*}
+                [:& {:width (px *container-lg-min*)}])]))
+
 (defn make-row
-  [gutter]
-  [clearfix
-   [:& {:margin-left (/ gutter -2)
-        :margin-right (/ gutter -2)}]])
+  ([] (make-row *grid-gutter*))
+  ([gutter]
+     [clearfix
+      [:& {:margin-left (px (/ gutter -2))
+           :margin-right (px (/ gutter -2))}]]))
 
 (defn make-column
-  [columns gutter]
-  {:position "relative"
-   :min-height "1px"
-   :padding-left (/ gutter 2)
-   :padding-right (/ gutter 2)
-   :float "left"
-   :width (str (double (* 100 (/ columns 12))) "%")})
+  ([columns] (make-column columns *grid-gutter*))
+  ([columns gutter]
+     {:position "relative"
+      :min-height "1px"
+      :padding-left (px (/ gutter 2))
+      :padding-right (px (/ gutter 2))
+      :float "left"
+      :width (str (double (* 100 (/ columns 12))) "%")}))
 
 (defstyles screen
   []
-  [[:* {:box-sizing "border-box"}]
-   [:.row (make-row 10) {:border [["solid" "1px" "#000"]]}]
-   [:.col-md-1 (make-column 1 10)]
-   [:.col-md-4 (make-column 4 10)]
-   [:.col-md-6 (make-column 6 10)]
-   [:.col-md-8 (make-column 8 10)]])
+  (binding [*grid-gutter* 10]
+    [[:* {:box-sizing "border-box"}]
+     [:.container (container)]
+     [:.row (make-row) {:border [["solid" "1px" "#000"]]}]
+     [:.col-md-1 (make-column 1)]
+     [:.col-md-4 (make-column 4)]
+     [:.col-md-6 (make-column 6)]
+     [:.col-md-8 (make-column 8)]]))
