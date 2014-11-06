@@ -1,10 +1,17 @@
 (ns gardengrids.core
+  ;;(:refer-clojure :exclude '[+ - * /])
   (:require [garden.core :refer [css]]
             [garden.def :refer [defstylesheet defstyles]]
             [garden.units :refer [px]]
-            [garden.stylesheet :refer [at-media]]))
+            [garden.stylesheet :refer [at-media]]
+           ;; [garden.arithmetic :refer [+ - * /]]
+            ))
 
 (def ^:dynamic *grid-gutter* 20)
+(def ^:dynamic *breakpoints* {:sm (px 768)
+                              :md (px 992)
+                              :lg (px 1200)})
+
 (def ^:dynamic *screen-sm-min* (px 768))
 (def ^:dynamic *screen-md-min* (px 992))
 (def ^:dynamic *screen-lg-min* (px 1200))
@@ -31,13 +38,13 @@
 (defn container
   ([] (container *grid-gutter*))
   ([gutter]
-     [(container-fixed gutter)
-      (at-media {:min-width *screen-sm-min*}
-                [:& {:width (px *container-sm-min*)}])
-      (at-media {:min-width *screen-md-min*}
-                [:& {:width (px *container-md-min*)}])
-      (at-media {:min-width *screen-lg-min*}
-                [:& {:width (px *container-lg-min*)}])]))
+     (into 
+      [(container-fixed gutter)]
+      (map (fn [break] 
+             (let [width (break *breakpoints*)]
+               (at-media {:min-width break}
+                         [:& {:width (- break (* gutter 2))}])))
+           (keys *breakpoints*)))))
 
 (defn make-row
   ([] (make-row *grid-gutter*))
